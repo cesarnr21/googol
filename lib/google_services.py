@@ -1,7 +1,9 @@
-import google.auth
 
 class google_service():
     def __init__(self):
-        print("this is a google service")
+        # import google.auth
+        # from googleapiclient import build
+        # from googleapiclient import HttpError
 
-    pass
+        # self.creds, _ = google.auth.default()
+        pass
