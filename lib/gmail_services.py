@@ -2,8 +2,21 @@
 from google_services import google_service
 
 class gmail_action(google_service):
-    def __init__(self):
-        google_service.__init__(self)
+    """docs here: https://www.thepythoncode.com/article/use-gmail-api-in-python"""
+    def __init__(self, creds_file):
+        app_scope = ['https://mail.google.com/']
+        google_service.__init__(self, creds_file, app_scope)
+        from googleapiclient.discovery import build
+        build('gmail', 'v1', credentials = self.creds)
+
+
+    def build_message(self, content, subject = '', attachments = ''):
+        # might remove these lines below
+        if subject == '':
+            subject = 'no_subject'
+
+        message = {'subject' : subject, 'content' : content, 'attachments' : attachments}
+        return message
 
 
     def create_draft(self, message):
@@ -21,6 +34,7 @@ class gmail_action(google_service):
         #     draft = None
 
         # return draft
+        return message
 
 
     def send_email(self, target_email, message):
@@ -28,37 +42,42 @@ class gmail_action(google_service):
         print("send email test:\n------------------------------")
         print("Target Email:", target_email)
         print("Message", message)
-        # import base64
-        # from email.message import EmailMessage
+        import base64
+        from email.message import EmailMessage
 
-        # import google.auth
-        # from googleapiclient.discovery import build
-        # from googleapiclient.errors import HttpError
+        from email.mime.text import MIMEText
 
 
-        # creds, _ = google.auth.default()
+        email = EmailMessage()
 
-        # try:
-        #     service = build('gmail', 'v1', credentials = creds)
+        email.set_content(message['content'])
 
-        #     email = EmailMessage()
+        email['To'] = target_email
+        email['From'] = 'source_email'
+        email['Subject'] = message['subject']
 
-        #     email.set_content(message['content'])
-
-        #     email['To'] = target_email
-        #     email['From'] = 'source_email'
-        #     email['Subject'] = message['subject']
-
-        # except HttpError as error:
-        #     print(F'An error occurred: {error}')
-        #     draft = None
+        place_hold = False
+        if place_hold:
+            from email.mime.multipart import MIMEMultipart
+            from email.mime.image import MIMEImage
+            from email.mime.audio import MIMEAudio
+            from email.mime.base import MIMEBase
+            from mimetypes import guess_type as guess_mime_type
 
 
         # pass
 
 
-    def add_attachemnt(self, message, attachments):
-        message['attachments'] = attachments
+    def add_attachemnts(self, message, attachments):
+        for i in range(len(attachments)):
+            message['attachments'][i] = attachments[i]
+
+            """working theory for already having attachments"""
+            """
+            index = len(message['attachments']) # get the lenght of the current attachments
+            message['attachments'][index] = attachments[i]
+            """
+
         return message
 
 

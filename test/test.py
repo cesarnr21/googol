@@ -16,7 +16,9 @@ from gmail_services import gmail_action
 from datetime import datetime
 now = datetime.now()
 
-message = {'Initial Test': 'Current time is ' + now.strftime('%H:%M:%S')}
-email = gmail_action()
-email.create_draft(message)
+email = gmail_action(creds_file = config['ceres_gapi_creds'])
+message = email.build_message(subject = 'Initial Test', content = 'Current time is ' + now.strftime('%H:%M:%S'))
+
+# email.create_draft(message)
+email.add_attachments(message, attachments = ('file1.txt', 'file542.txt', 'screenshot.png'))
 email.send_email(config['target_email'], message)
