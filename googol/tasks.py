@@ -4,10 +4,7 @@ from .drive import *
 
 
 def send_email(email: str, target:str, subject: str = '', message: str = '', attach: tuple = None):
-    """
-    Description
-    -----------
-    wrapper function to create an email object and send it
+    """wrapper function to create an email object and send it
 
     Parameters
     ----------
