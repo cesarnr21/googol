@@ -6,7 +6,10 @@ To use Google Services and APIs, they need to be setup in the developer board. *
 
 Then download the API credentials to a `json` file and create an enviroment variable `GOOGLE_CREDENTIALS_FILE` that points to its path. Also, create a `GOOGLE_CREDENTIALS_PICKLE_FILE` enviroment variable to minimize the amount of authentication needed.
 
+<<<<<<< HEAD
 > Note that this package is only meant for personal use, use at your own risk.
+=======
+>>>>>>> 8af9540 (add task)
 
 ## Gmail Module
 ### Sending Emails
