@@ -1,213 +1,67 @@
 from base64 import urlsafe_b64decode
 from email import message
-from typing import Dict
-from .google import GoogleService
+from typing import Sequence
 import base64
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
-from email.mime.audio import MIMEAudio
-from email.mime.base import MIMEBase
-from mimetypes import guess_type as guess_mime_type
 import os
 from pathlib import Path
 
+from .google import GoogleService
+from .email import GoogolEmail
 
-class GmailMessage(GoogleService):
-    """
-    Description
-    -----------
+
+class GmailMessage(GoogleService, GoogolEmail):
+    """Used to build and send emails using the Gmail API
+
     docs here: https://www.thepythoncode.com/article/use-gmail-api-in-python
-
-    Used to build and send emails using the Gmail API
 
     Parameters
     ----------
-    creds_file: `str`
+    credentials_file: `str | Path` (OPTIONAL)
         json file that is downloaded from google's cloud console and is used for account verificiation
-
-    auth_file: `str` (OPTIONAL)
-        this pickle file used to save the verification from google and the creds_file. it help with 
-        reducing the amount of times that reverifiction through a browser is done
 
     notify: `bool` (OPTIONAL)
         this is used to select whether to print out output to the console
-
-    Methods
-    -------
-    `__init__(creds_file: str, auth_file: str, notify: bool)`: 
-        initializes the object
-
-    `build_message(subject: str, content: str, attachments: tuple)`:
-        This is used to put together the message being sent.
-
-    `add_attachments(new_attachmnets: tuple)`:
-        used to add attachments to the object
-
-    `send_email(source_email: str, destination_email: str)`:
-        this method sends out the email object
     """
-    def __init__(self, creds_file: str, auth_file: str = None, notify: bool = False):
+    def __init__(self, credentials_file: str | Path = None, notify: bool = False):
         app_scope = ['https://mail.google.com/']
-        super().__init__(app_scope, creds_file, auth_file)
+        super().__init__(app_scope, credentials_file)
         from googleapiclient.discovery import build
-        self.service = build('gmail', 'v1', credentials = self.creds)
+        self.service = build('gmail', 'v1', credentials = self.credentials)
         self.notify = notify
 
 
-    def build_message(self, subject: str = '', content: str = '', attachments: tuple = ''):
-        """
-        Description
-        -----------
-        This is used to put together the message being sent.
-
-        Parameters
-        ----------
-        subject: `str`
-            subject line of the email
-
-        contents: `str`
-            message being sent, the body of the email
-
-        attachments: `tuple` (OPTIONAL)
-            a list of attachemtns that are to be sent
-
-        Return
-        ------
-        contents: includes all of the content from the file. This is due to the fact later in the script,
-            writing the file removes all of the content of the file, so it has to be rewritten
-
-        headers: a list that includes all the headers in format [index, header_rank, header_string]
-
-        placement: stores the line where the table of contents will be inserted
-        """
-        if subject == '':
-            subject = 'no_subject'
-
-        if len(attachments) != 0:
-            attach_buf = []
-
-            if len(attachments) == 1:
-                attach_buf[0] = attachments
-            else:
-                for i in range(len(attachments)):
-                    attach_buf.append(attachments[i])
-
-            self.message = {'subject': subject, 'content': content, 'attachments': attach_buf}
-
-        else:
-            self.message = {'subject': subject, 'content': content, 'attachments': attachments}
-
-        return self.message
-
-
-    def build_attach(self, mail, attachment) -> None:
-        """
-        looks for attachments and encodes them, gets them ready to be sent
-        """
-        content_type, encoding = guess_mime_type(attachment)
-        if content_type is None or encoding is not None:
-            content_type = 'application/octet-stream'
-
-        main_type, sub_type = content_type.split('/', 1)
-
-        try:
-            if main_type == 'text':
-                with open(attachment, 'rb') as file:
-                   msg = MIMEText(file.read().decode(), _subtype = sub_type)
-
-            elif main_type == 'image':
-                with open(attachment, 'rb') as file:
-                   msg = MIMEImage(file.read(), _subtype = sub_type)
-
-            elif main_type == 'audio':
-                with open(attachment, 'rb') as file:
-                    msg = MIMEAudio(file.read(), _subtype = sub_type)
-
-            else:
-                with open(attachment, 'rb') as file:
-                    msg = MIMEBase(main_type, sub_type)
-                msg.set_payload(file.read())
-
-            attachment = os.path.basename(attachment)
-            msg.add_header('Content-Disposition', 'attachment', file = attachment)
-            mail.attach(msg)
-
-        except FileNotFoundError:
-            print(attachment)
-            print("ERROR: Attachments not found. Make sure you specify full path of file you want to attach")
-
-
-    def create_draft(self):
-        """
-        docs here: https://developers.google.com/gmail/api/guides/drafts
-        will most likely not use this function
-        """
-        print("create draft test:\n------------------------")
-        print(self.message)
-        return self.message
-
-
-    def send_email(self, source_mail: str, target_mail: str | tuple | list) -> None:
-        """
-        Description
-        -----------
-        This is used to put together the message being sent.
+    def send_email(self, src_email: str, dest: Sequence) -> None:
+        """Send Email
         docs here: https://developers.google.com/gmail/api/guides/sending
 
         Parameters
         ----------
-        source_email: `str`
-            subject line of the email
+        src_email: `str`
+            Email of sender
 
-        target_email: `str`
-            message being sent, the body of the email
-
-        Return
-        ------
-        No returns
+        dest: `str`
+            Email of recipient
         """
-        if isinstance(target_mail, str):
-            recipients = 1
-        elif isinstance(target_mail, list) or isinstance(target_mail, tuple):
-            recipients = len(target_mail)
+        recipients = 1 if isinstance(dest, str) else len(dest)
 
-        for i in range(recipients):
-            if not self.message['attachments']:
-                mail = MIMEText(self.message['content'])
-                mail['To'] = target_mail if isinstance(target_mail, str) else target_mail[i]
-                mail['From'] = source_mail
-                mail['Subject'] = self.message['subject']
+        # TODO: add email/phone verifier, if dest is a phone number, then lookup network email
 
-            else:
-                mail = MIMEMultipart()
-                mail['To'] = target_mail if isinstance(target_mail, str) else target_mail[i]
-                mail['From'] = source_mail
-                mail['Subject'] = self.message['subject']
-                mail.attach(MIMEText(self.message['content']))
+        for index in range(recipients):
+            mail = MIMEMultipart()
+            mail['To'] = dest if isinstance(dest, str) else dest[index]
+            mail['From'] = src_email
+            mail['Subject'] = self.message['subject']
+            mail.attach(MIMEText(self.message['content']))
 
-                for i in range(len(self.message['attachments'])):
-                    self.build_attach(mail, self.message['attachments'][i])
+            if not isinstance(self.message['attachments'], type(None)):
+                for attachment in self.message['attachments']:
+                    self.build_attach(mail, attachment)
 
+            # FIXME: redownload
             self.service.users().messages().send(userId = 'me', body = {'raw': base64.urlsafe_b64encode(mail.as_bytes()).decode()}).execute()
 
-
-    def add_attachments(self, attachments: tuple = ()):
-        """
-        Description
-        -----------
-        Used to add attachemnts to the email object
-        docs here: https://developers.google.com/gmail/api/guides/sending
-
-        Parameters
-        ----------
-        attachments: `tuple`
-            a list of attachemtns that are to be sent
-        """
-        for i in range(len(attachments)):
-            self.message['attachments'].append(attachments[i])
-
-        return self.message
 
 
 class GmailAction(GoogleService):
@@ -216,11 +70,11 @@ class GmailAction(GoogleService):
     https://www.thepythoncode.com/article/use-gmail-api-in-python#Reading_Emails
     """
 
-    def __init__(self, creds_file: str = None, auth_file: str = None, notify: bool = False):
+    def __init__(self,notify: bool = False):
         app_scope = ['https://mail.google.com/']
-        super().__init__(app_scope, creds_file, auth_file)
+        super().__init__(app_scope)
         from googleapiclient.discovery import build
-        self.service = build('gmail', 'v1', credentials = self.creds)
+        self.service = build('gmail', 'v1', credentials = self.credentials)
         self.notify = notify
 
 

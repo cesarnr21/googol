@@ -1,5 +1,6 @@
 import google.auth
 from .google import GoogleService
+import pandas as pd
 import os
 
 
@@ -19,9 +20,9 @@ class DriveAction(GoogleService):
 
     notify (OPTIONAL): this is used to select whether to print out output to the console
     """
-    def __init__(self, creds_file: str = None, auth_file: str = None, notify: bool = False):
+    def __init__(self, notify: bool = False):
         app_scope = ['https://drive.google.com/']
-        super().__init__(app_scope, creds_file, auth_file)
+        super().__init__(app_scope)
         self.notify = notify
 
     # should this be separate from using using folder?
@@ -61,6 +62,6 @@ class GoogleSheet(DriveAction):
 
     notify (OPTIONAL): this is used to select whether to print out output to the console
     """
-    def __init__(self, creds_file: str = None, auth_file: str = None, notify: bool = False):
+    def __init__(self, notify: bool = False):
         app_scope = 'place holder look this up'
-        super().__init__(app_scope, creds_file, auth_file, notify)
+        super().__init__(app_scope, notify)

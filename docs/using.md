@@ -1,13 +1,37 @@
 # Notes on Google APIs
 
-## Gmail
-response to:
-```py
-self.service.users().messages().list(userId = 'me', q = 'query').execute()
-```
-is a list of emails that match the search query
+<br>
 
-### Gmail Search Query
+## Set Up API
+To use Google Services and APIs, they need to be setup
+> Reference: <https://www.thepythoncode.com/article/use-gmail-api-in-python>
+
+<br>
+
+Install the necessary dependencies
+
+```bash
+$ python3 -m install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+```
+
+1. Enable API for Services that you want to access. Get a Token from **[Google's API Dashboard](https://console.cloud.google.com/apis/dashboard?pli=1&project=ceres-server)**. It might be necessary to create a Cloud Project to be able to enable APIs
+
+2. Once the project is created, select **`ENABLE APIS AND SERVICES`** then search for the API you want enable, for example the **Gmail API**
+
+3. Enable the API and then on the left of screen go to **`Credentials`** and **`CREATE CREDENTIALS`**
+
+4. Select **`OAuth client ID`** from the options and fill out the requested info **Web application -> [choose client-name] -> Save**. Download the Client ID as a json file
+
+5. In the left side of the screen, select **`OAuth consent screen`** and make sure that the publishing status is set to `Testing`
+
+6. Create an enviroment variable **`GOOGLE_CREDENTIALS_FILE`** to store the path location of the Client ID json file
+
+7. Also, create a **`GOOGLE_CREDENTIALS_PICKLE_FILE`** enviroment variable to save a `pickle` token to minimize the amount of authentication needed.
+
+<br>
+<br>
+
+## Gmail Search Query
 For a full list of Gmail search Operators, go here: <https://support.google.com/mail/answer/7190>
 
 --------------------------------------------------------
