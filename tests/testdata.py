@@ -1,6 +1,6 @@
-'''
+"""
 FIXME: add appropiate docstring
-'''
+"""
 
 from pathlib import Path
 

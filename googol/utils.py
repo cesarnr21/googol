@@ -13,14 +13,14 @@ def set_env():
     pass
 
 mesage = (
-    f'''
+    f"""
     Set up both
     Cesar is the bets
 
     numpy version: {numpy.__version__}
     matplotlib version: {matplotlib.__version__}
     pandas version: {pandas.__version__}
-    '''
+    """
 )
 
 print(mesage)

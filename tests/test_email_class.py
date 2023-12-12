@@ -1,4 +1,4 @@
-'''tests the functionality of the GoogolEmail Parent Class'''
+"""tests the functionality of the GoogolEmail Parent Class"""
 
 import unittest
 from googol import GoogolEmail
