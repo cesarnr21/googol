@@ -1,3 +1,4 @@
 __pycache__
 googol.egg-info/
 .vscode
+.coverage

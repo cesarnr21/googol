@@ -1,58 +1,47 @@
 [project]
 name = "googol"
-
+# project info
 # set these as dynamic so that they don"t have to be defined manually
 dynamic = ["version", "readme"]
 requires-python = ">=3.7"
 
-# description and maintainers are optional
-description = "Just some modules that allow to use some Google Services"
-authors = [
-    {name = "Cesar Nunez Rodriguez", email = "cesarnr21@gmail.com" }
-]
-
-maintainers = [
-    {name = "Cesar Nunez Rodriguez", email = "cesarnr21@gmail.com" }
-]
-
-# optional: this field lists other packages that your project depends on to run.
-# any package you put here will be installed by pip when your project is
-# installed,
 dependencies = [
     "google-auth",
     "google-api-python-client",
     "google-auth-httplib2",
     "google-auth-oauthlib"
 ]
+description = "Just some modules that allow to use some Google Services"
+authors = [{name = "Cesar Nunez Rodriguez", email = "cesarnr21@gmail.com" }]
+maintainers = [{name = "Cesar Nunez Rodriguez", email = "cesarnr21@gmail.com" }]
 
-# optional: list urls that are relevant to the project
+
 [project.urls]
 "source" = "https://github.com/cesarnr21/googol"
 "bug tracker" = "https://github.com/cesarnr21/googol/issues"
 
+
+# set up packaging
 [build-system]
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
-# list additional groups of dependencies here (e.g. development
-# dependencies). users will be able to install these using the "extras"
-# syntax, for example:
-
-#   $ pip install sampleproject[dev]
-
-# optional
-[project.optional-dependencies]
-dev = ["black", "flake8", "pylint", "yapf"]
-test = ["pytest"]
 
 [tool.setuptools]
-# required
 packages = ["googol"]
+package-dir = {"" = "src/"}
+
 
 [tool.setuptools.dynamic]
 version = {attr = "googol.__version__"}  # required
-# optional
 readme = {file = ["README.md", "docs/USING.md"], content-type = "text/plain"}
+
+
+# set up development enviroment
+[project.optional-dependencies]
+dev = ["black", "flake8", "pylint", "yapf"]
+test = ["pytest", "pytest-cov"]
+
 
 [tool.black]
 line_length = 120

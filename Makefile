@@ -2,7 +2,7 @@
 
 test: ## Run all tests
 	@echo "+ $@"
-	@python3 -m pytest
+	@python3 -m pytest --cov
 
 develop: ## Install package in editable mode with pip
 	@echo "+ $@"
